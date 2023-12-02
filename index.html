@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuicKMatch</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="main">
+    <div class="header">
+        <h2>[ Welcome To QuicKMatch ]</h2>
+        <h3>Who is more handsome or beautiful? Upload your image and join the ride</h3>
+    </div>
+    <form id="uploadForm">
+        <label for="nameInput">Your Name:</label>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+
+        <div class="Clicks">
+            <input type="file" id="imageInput" accept=".jpg, .jpeg, .png" style="display: none;">
+            <label for="imageInput" class="fileInputLabel">Choose Image</label>
+            
+            <button type="button" onclick="uploadImage()" class="Upload">Upload Image</button>
+        </div>
+    </form>
+    <div id="imageContainer"></div>
+    <div id="leaderboard" style="display: none;">
+        <h2>Hotness Leaderboard</h2>
+        <ol id="leaderboardList"></ol>
+    </div>
+    
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+        apiKey: "AIzaSyBdfT2RXdTRnFF9DKvhLpr3Bqi9EI8geq0",
+        authDomain: "quick-matched.firebaseapp.com",
+        projectId: "quick-matched",
+        storageBucket: "quick-matched.appspot.com",
+        messagingSenderId: "327012982409",
+        appId: "1:327012982409:web:0eb56a4f7fbd35dd17f058",
+        measurementId: "G-10NDJX02YS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        import {getDatabase, ref, set, child, update, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+        const db = getDatabase();
+
+        let nameInput;
+        let userImage;
+        let randomImage1;
+        let randomImage2;
+        let hotnessRankings = [];
+        let leaderboardVisible = false;
+
+        function uploadImage() {
+            nameInput = document.getElementById("nameInput");
+            const imageInput = document.getElementById("imageInput");
+            const imageContainer = document.getElementById("imageContainer");
+            const leaderboard = document.getElementById("leaderboard");
+            const leaderboardList = document.getElementById("leaderboardList");
+            const uploadForm = document.getElementById("uploadForm");
+
+            if (nameInput.value.trim() === "") {
+                alert("Please enter your name.");
+                return;
+            }
+
+            if (imageInput.files.length > 0) {
+                const file = imageInput.files[0];
+                
+                const imageUrl = URL.createObjectURL(file);
+                userImage = document.createElement("img");
+                userImage.src = imageUrl;
+                userImage.classList.add("uploaded-image");
+
+                uploadForm.style.display = "none";
+
+                const userImagePosition = Math.random() < 0.5 ? 1 : 2;
+
+                randomImage1 = document.createElement("img");
+                randomImage1.src = getRandomImageUrl();
+                randomImage1.classList.add("random-image");
+
+                randomImage2 = document.createElement("img");
+                randomImage2.src = getRandomImageUrl();
+                randomImage2.classList.add("random-image");
+
+                if (userImagePosition === 1) {
+                    randomImage1.user = nameInput.value.trim();
+                    randomImage2.user = getRandomName();
+                } else {
+                    randomImage1.user = getRandomName();
+                    randomImage2.user = nameInput.value.trim();
+                }
+
+                const containerDiv = document.createElement("div");
+                
+                const nameParagraph = document.createElement("p");
+                nameParagraph.textContent = `${nameInput.value.trim()}`;
+
+                containerDiv.appendChild(nameParagraph);
+                containerDiv.appendChild(randomImage1);
+                containerDiv.appendChild(randomImage2);
+
+                randomImage1.addEventListener("click", function() {
+                    handleComparison(randomImage1, randomImage2);
+                });
+
+                randomImage2.addEventListener("click", function() {
+                    handleComparison(randomImage2, randomImage1);
+                });
+
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(containerDiv);
+
+                if (!leaderboardVisible) {
+                    leaderboard.style.display = "block";
+                    leaderboardVisible = true;
+                    updateLeaderboard();
+                }
+            } else {
+                alert("Please select an image to upload.");
+            }
+        }
+
+        function handleComparison(selectedImage, otherImage) {
+            selectedImage.src = getRandomImageUrl();
+            selectedImage.user = getRandomName();
+
+            otherImage.src = getRandomImageUrl();
+            otherImage.user = getRandomName();
+
+            updateNames();
+            updateLeaderboard();
+        }
+
+        function updateNames() {
+            const nameParagraph = document.createElement("p");
+            nameParagraph.textContent = `${nameInput.value.trim()}`;
+
+            const randomName1Paragraph = document.createElement("p");
+            randomName1Paragraph.textContent = `${randomImage1.user}`;
+
+            const randomName2Paragraph = document.createElement("p");
+            randomName2Paragraph.textContent = `${randomImage2.user}`;
+
+            containerDiv.innerHTML = '';
+            containerDiv.appendChild(nameParagraph);
+            containerDiv.appendChild(randomImage1);
+            containerDiv.appendChild(randomName1Paragraph);
+            containerDiv.appendChild(randomImage2);
+            containerDiv.appendChild(randomName2Paragraph);
+        }
+
+        function updateLeaderboard() {
+            const hotnessRanking = {
+                name: nameInput.value.trim(),
+                hotness: Math.floor(Math.random() * 100) + 1
+            };
+
+            hotnessRankings.push(hotnessRanking);
+
+            hotnessRankings.sort((a, b) => b.hotness - a.hotness);
+
+            const leaderboardList = document.getElementById("leaderboardList");
+            leaderboardList.innerHTML = '';
+
+            for (let i = 0; i < Math.min(hotnessRankings.length, 10); i++) {
+                const listItem = document.createElement("li");
+                listItem.textContent = `${hotnessRankings[i].name}`;
+
+                if (i === 0) {
+                    listItem.innerHTML += ' 🌟🔥';
+                }
+
+                leaderboardList.appendChild(listItem);
+            }
+        }
+
+        function getRandomImageUrl() {
+            const imageUrls = [
+                "https://via.placeholder.com/10",
+                "https://via.placeholder.com/110",
+                "https://via.placeholder.com/150",
+                "https://via.placeholder.com/100",
+                "https://via.placeholder.com/1",
+                "https://via.placeholder.com/120",
+            ];
+
+            const randomIndex = Math.floor(Math.random() * imageUrls.length);
+
+            return imageUrls[randomIndex];
+        }
+
+        function getRandomName() {
+            const names = ["John", "Alice", "Bob", "Eva", "Michael", "Sophia"];
+            const randomIndex = Math.floor(Math.random() * names.length);
+            return names[randomIndex];
+        }
+    </script>
+</body>
+</html>

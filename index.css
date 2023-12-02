@@ -1,0 +1,124 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+}
+
+.header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+form {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.fileInputLabel {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.fileInputLabel:hover {
+    background-color: #45a049;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#imageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.Clicks{
+    display: flex;
+    flex-direction: row;
+}
+.Upload{
+    height: 10%;
+    margin-left: 30%;
+}
+#imageContainer p {
+    margin: 0;
+    font-size: 34px;
+    color: #000;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#imageContainer img {
+    max-width: 100%;
+    height: 300px;
+    margin-top: 10px;
+}
+#imageContainer .separator {
+    margin: 0 10px;
+    font-size: 38px;
+}
+
+@media only screen and (max-width: 600px) {
+    .Clicks {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .Upload {
+        height: 15%;
+        margin-left: 30%;
+    }
+
+    #imageContainer img {
+        max-height: 200px;
+    }
+
+    #imageContainer p {
+        font-size: 16px;
+    }
+}
+
